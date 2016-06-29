@@ -191,7 +191,7 @@ module BootstrapForm
       options[:class] << " #{error_class}" if has_error?(name)
       options[:class] << " #{feedback_class}" if options[:icon]
 
-      content_tag(:div, options.except(:id, :label, :help, :icon, :label_col, :control_col, :layout)) do
+      content_tag(:fieldset, options.except(:id, :label, :help, :icon, :label_col, :control_col, :layout)) do
         label = generate_label(options[:id], name, options[:label], options[:label_col], options[:layout]) if options[:label]
         control = capture(&block).to_s
         control.concat(generate_help(name, options[:help]).to_s)
@@ -251,13 +251,17 @@ module BootstrapForm
     def control_class
       "form-control"
     end
+    
+    def control_error_class
+      "form-control-danger"
+    end
 
     def label_class
-      "control-label"
+      "form-control-label"
     end
 
     def error_class
-      "has-error"
+      "has-danger"
     end
 
     def feedback_class
@@ -302,6 +306,7 @@ module BootstrapForm
       # Add control_class; allow it to be overridden by :control_class option
       css_options = html_options || options
       control_classes = css_options.delete(:control_class) { control_class }
+      control_classes = [control_classes, control_error_class] if has_error?(method)
       css_options[:class] = [control_classes, css_options[:class]].compact.join(" ")
 
       options = convert_form_tag_options(method, options) if acts_like_form_tag
@@ -359,7 +364,8 @@ module BootstrapForm
 
     def generate_label(id, name, options, custom_label_col, group_layout)
       options[:for] = id if acts_like_form_tag
-      classes = [options[:class], label_class]
+      classes = [options[:class]]
+      classes << label_class if group_layout.eql?(:inline)
       classes << (custom_label_col || label_col) if get_group_layout(group_layout) == :horizontal
       classes << "required" if required_attribute?(object, name)
 
@@ -381,11 +387,12 @@ module BootstrapForm
 
       help_text ||= get_help_text_by_i18n_key(name)
 
-      content_tag(:span, help_text, class: 'help-block') if help_text.present?
+      content_tag(:small, help_text, class: 'text-muted') if help_text.present?
     end
 
     def generate_icon(icon)
-      content_tag(:span, "", class: "glyphicon glyphicon-#{icon} form-control-feedback")
+      #content_tag(:span, "", class: "glyphicon glyphicon-#{icon} form-control-feedback")
+      content_tag(:i, "", class: "fa fa-#{icon} form-control-feedback")
     end
 
     def get_error_messages(name)
