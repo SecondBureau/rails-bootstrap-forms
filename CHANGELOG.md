@@ -1,9 +1,27 @@
-## Pending Release
+## [Pending Release][]
+
+Bugfixes:
+
+  - Sanitize <label> name (IE `for` attribute) in same manner that Rails sanitizes
+    the <input> `id` attribute to fix a11y issue with `for` and `id` mismatch
+  - Fix loading of ActionView helpers in combination with RSpec and `rails-controller-testing`. (see [rails-controller-testing/issues#24](https://github.com/rails/rails-controller-testing/issues/24))
+  - Your contribution here!
+
+Features:
+
+  - Add support for input-group-sm and input-group-lg in prepend/append (#226, @rusanu)
+  - Added option to prevent the 'required' CSS class on labels (#205, @LucasAU)
+  - Your contribution here!
+
+## [2.4.0][] (2016-07-04)
+
+This version is ready to use with Rails 5.0.0!
 
 Bugfixes:
 
   - Minor README corrections (#184, @msmithstubbs)
   - Fix `alias_method_chain` deprecation warnings when using Rails 5
+  - Allow `form_group` to work with frozen string options
 
 Features:
 
@@ -111,3 +129,7 @@ Features:
   - Added errors_on helper (@baldwindavid)
   - Added per field layout option (@baldwindavid)
   - Added support for bootstrap_form_tag (@baldwindavid)
+
+
+[Pending Release]: https://github.com/bootstrap-ruby/rails-bootstrap-forms/compare/v2.4.0...HEAD
+[2.4.0]: https://github.com/bootstrap-ruby/rails-bootstrap-forms/compare/v2.3.0...v2.4.0

@@ -117,7 +117,13 @@ module BootstrapForm
       html.concat(" ").concat(label_content || (object && object.class.human_attribute_name(name)) || name.to_s.humanize)
 
       label_name = name
-      label_name = "#{name}_#{checked_value}" if options[:multiple]
+      # label's `for` attribute needs to match checkbox tag's id,
+      # IE sanitized value, IE
+      # https://github.com/rails/rails/blob/c57e7239a8b82957bcb07534cb7c1a3dcef71864/actionview/lib/action_view/helpers/tags/base.rb#L116-L118
+      if options[:multiple]
+        label_name =
+          "#{name}_#{checked_value.to_s.gsub(/\s/, "_").gsub(/[^-\w]/, "").downcase}"
+      end
 
       disabled_class = " disabled" if options[:disabled]
       label_class    = options[:label_class]
@@ -198,10 +204,10 @@ module BootstrapForm
         control.concat(generate_icon(options[:icon])) if options[:icon]
 
         if get_group_layout(options[:layout]) == :horizontal
-          control_class = (options[:control_col] || control_col.clone)
+          control_class = options[:control_col] || control_col
           unless options[:label]
             control_offset = offset_col(/([0-9]+)$/.match(options[:label_col] || @label_col))
-            control_class.concat(" #{control_offset}")
+            control_class = "#{control_class} #{control_offset}"
           end
           control = content_tag(:div, control, class: control_class)
         end
@@ -347,7 +353,8 @@ module BootstrapForm
 
         form_group_options.merge!(label: {
           text: label_text,
-          class: label_class
+          class: label_class,
+          skip_required: options.delete(:skip_required)
         })
       end
 
@@ -367,7 +374,9 @@ module BootstrapForm
       classes = [options[:class]]
       classes << label_class if group_layout.eql?(:inline)
       classes << (custom_label_col || label_col) if get_group_layout(group_layout) == :horizontal
-      classes << "required" if required_attribute?(object, name)
+      unless options.delete(:skip_required)
+        classes << "required" if required_attribute?(object, name)
+      end
 
       options[:class] = classes.compact.join(" ")
 
