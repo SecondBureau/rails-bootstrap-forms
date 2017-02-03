@@ -206,7 +206,7 @@ module BootstrapForm
         if get_group_layout(options[:layout]) == :horizontal
           control_class = options[:control_col] || control_col
           unless options[:label]
-            control_offset = offset_col(/([0-9]+)$/.match(options[:label_col] || @label_col))
+            control_offset = offset_col(options[:label_col] || @label_col)
             control_class = "#{control_class} #{control_offset}"
           end
           control = content_tag(:div, control, class: control_class)
@@ -242,8 +242,8 @@ module BootstrapForm
       "col-sm-2"
     end
 
-    def offset_col(offset)
-      "col-sm-offset-#{offset}"
+    def offset_col(label_col)
+      label_col.sub(/^col-(\w+)-(\d)$/, 'col-\1-offset-\2')
     end
 
     def default_control_col
@@ -432,15 +432,25 @@ module BootstrapForm
     end
 
     def get_help_text_by_i18n_key(name)
-      underscored_scope = "activerecord.help.#{object.class.name.underscore}"
-      downcased_scope = "activerecord.help.#{object.class.name.downcase}"
-      help_text = I18n.t(name, scope: underscored_scope, default: '').presence
-      help_text ||= if text = I18n.t(name, scope: downcased_scope, default: '').presence
-        warn "I18n key '#{downcased_scope}.#{name}' is deprecated, use '#{underscored_scope}.#{name}' instead"
-        text
-      end
+      if object
 
-      help_text
+        if object.class.respond_to?(:model_name)
+          # ActiveModel::Naming 3.X.X does not support .name; it is supported as of 4.X.X
+          partial_scope = object.class.model_name.respond_to?(:name) ? object.class.model_name.name : object.class.model_name
+        else
+          partial_scope = object.class.name
+        end
+
+        underscored_scope = "activerecord.help.#{partial_scope.underscore}"
+        downcased_scope = "activerecord.help.#{partial_scope.downcase}"
+        help_text = I18n.t(name, scope: underscored_scope, default: '').presence
+        help_text ||= if text = I18n.t(name, scope: downcased_scope, default: '').presence
+                        warn "I18n key '#{downcased_scope}.#{name}' is deprecated, use '#{underscored_scope}.#{name}' instead"
+                        text
+                      end
+        help_text
+      end
     end
+
   end
 end
