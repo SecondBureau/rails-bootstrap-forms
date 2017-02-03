@@ -287,7 +287,19 @@ module BootstrapForm
       return false unless obj and attribute
 
       target = (obj.class == Class) ? obj : obj.class
+      
+      # check for required based on associations when rails > 4.2.0
+      if Gem::Version.new(::Rails::VERSION::STRING) >= Gem::Version.new("4.2.0")
+        target.reflect_on_all_associations(:belongs_to).each do |assoc|
+          return true if assoc.foreign_key.to_sym == attribute && assoc.options[:required] == true
+        end
 
+        target.reflect_on_all_associations(:has_one).each do |assoc|
+          return true if assoc.foreign_key.to_sym == attribute && assoc.options[:required] == true
+        end
+      end
+
+      # check for required based on validators
       target_validators = if target.respond_to? :validators_on
                             target.validators_on(attribute).map(&:class)
                           else
