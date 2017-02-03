@@ -279,7 +279,11 @@ module BootstrapForm
     end
 
     def has_error?(name)
-      object.respond_to?(:errors) && !(name.nil? || object.errors[name].empty?)
+      return false unless object.respond_to?(:errors)
+      return true if !(name.nil? || object.errors[name].empty?)
+      target = (object.class == Class) ? object : object.class
+      assoc = target.reflect_on_all_associations(:belongs_to).select{|_| _.foreign_key.to_sym.eql?(name)}.first
+      !(assoc.blank? || object.errors[assoc.name].empty?)
     end
 
     def required_attribute?(obj, attribute)
@@ -290,13 +294,12 @@ module BootstrapForm
       
       # check for required based on associations when rails > 4.2.0
       if Gem::Version.new(::Rails::VERSION::STRING) >= Gem::Version.new("4.2.0")
-        target.reflect_on_all_associations(:belongs_to).each do |assoc|
-          return true if assoc.foreign_key.to_sym == attribute && assoc.options[:required] == true
-        end
-
-        target.reflect_on_all_associations(:has_one).each do |assoc|
-          return true if assoc.foreign_key.to_sym == attribute && assoc.options[:required] == true
-        end
+        # target.reflect_on_all_associations(:belongs_to).each do |assoc|
+        #   #debugger if attribute.eql?(:business_product_id)
+        #   return true if assoc.foreign_key.to_sym.eql?(attribute) && !assoc.options[:optional]
+        # end
+        assoc = target.reflect_on_all_associations(:belongs_to).select{|_| _.foreign_key.to_sym.eql?(attribute)}.first
+        return true unless assoc.blank? || assoc.options[:optional]
       end
 
       # check for required based on validators
@@ -416,8 +419,15 @@ module BootstrapForm
       content_tag(:i, "", class: "fa fa-#{icon} form-control-feedback")
     end
 
-    def get_error_messages(name)
-      object.errors[name].join(", ")
+    def get_error_messages(name)      
+      errors = object.errors[name]
+      if errors.empty?
+        target = (object.class == Class) ? object : object.class
+        assoc = target.reflect_on_all_associations(:belongs_to).select{|_| _.foreign_key.to_sym.eql?(name)}.first
+        errors = object.errors[assoc.name] unless assoc.nil?
+      end
+      
+      errors.join(", ")
     end
 
     def inputs_collection(name, collection, value, text, options = {}, &block)
