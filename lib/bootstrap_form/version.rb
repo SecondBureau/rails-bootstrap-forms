@@ -1,3 +1,3 @@
 module BootstrapForm
-  VERSION = "2.3.0"
+  VERSION = "4.0.0.dev".freeze
 end
