@@ -1,5 +1,47 @@
 ## [Pending Release][]
 
+### Breaking changes
+
+* Your contribution here!
+
+### New features
+
+* Your contribution here!
+
+### Bugfixes
+
+* Your contribution here!
+
+## [4.0.0][] (2018-10-27)
+
+🚨 **This release adds support for Bootstrap v4 and drops support for Bootstrap v3.** 🚨
+
+If your app uses Bootstrap v3, you should continue using bootstrap_form 2.7.x instead.
+
+Bootstrap v3 and v4 are very different, and thus bootstrap_form now produces different markup in order to target v4. The changes are too many to list here; you can refer to Bootstrap's [Migrating to v4](https://getbootstrap.com/docs/4.0/migration/) page for a detailed explanation.
+
+In addition to these necessary markup changes, the bootstrap_form API itself has the following important changes in this release.
+
+### Breaking changes
+
+* See [Migrating to v4](https://getbootstrap.com/docs/4.0/migration/).
+
+### New features
+
+* [#476] Give a way to pass classes to the `div.form-check` wrapper for check boxes and radio buttons - [@lcreid](https://github.com/lcreid).
+* [461](https://github.com/bootstrap-ruby/bootstrap_form/pull/461): default form-inline class applied to parent content div on date select helpers. Can override with a :skip_inline option on the field helper - [@lancecarlson](https://github.com/lancecarlson).
+* The `button`, `submit`, and `primary` helpers can now receive an additional option, `extra_class`. This option allows us to specify additional CSS classes to be added to the corresponding button/input, _while_ maintaining the original default ones. E.g., a primary button with an `extra_class` 'test-button' will have its final CSS classes declaration as 'btn btn-primary test-button'.
+* [#488](https://github.com/bootstrap-ruby/bootstrap_form/pull/488): add required option on form_group_builder - [@ThomasSevestre](https://github.com/ThomasSevestre).
+
+### Bugfixes
+
+* [#347](https://github.com/bootstrap-ruby/bootstrap_form/issues/347) Fix `wrapper_class` and `wrapper` options for helpers that have `html_options`.
+* [#472](https://github.com/bootstrap-ruby/bootstrap_form/pull/472) Use `id` option value as `for` attribute of label for custom checkboxes and radio buttons.
+* [#478](https://github.com/bootstrap-ruby/bootstrap_form/issues/478) Fix offset for form group without label when multiple label widths are specified.
+
+
+## [4.0.0.alpha1][] (2018-06-16)
+
 🚨 **This release adds support for Bootstrap v4 and drops support for Bootstrap v3.** 🚨
 
 If your app uses Bootstrap v3, you should continue using bootstrap_form 2.7.x instead.
@@ -18,8 +60,10 @@ In addition to these necessary markup changes, the bootstrap_form API itself has
 * `hide_label: true` and `skip_label: true` on individual check boxes and radio buttons apply Bootstrap 4 markup. This means the appearance of a page may change if you're upgrading from the Bootstrap 3 version of `bootstrap_form`, and you used `check_box` or `radio_button` with either of those options
 * `static_control` will no longer properly show error messages. This is the result of bootstrap changes.
 * `static_control` will also no longer accept a block, use the `value` option instead.
-* Your contribution here!
+* `form_group` with a block that produces arbitrary text needs to be modified to produce validation error messages (see the UPGRADE-4.0 document). [@lcreid](https://github.com/lcreid).
+* `form_group` with a block that contains more than one `check_box` or `radio_button` needs to be modified to produce validation error messages (see the UPGRADE-4.0 document). [@lcreid](https://github.com/lcreid).
 * [#456](https://github.com/bootstrap-ruby/bootstrap_form/pull/456): Fix label `for` attribute when passing non-english characters using `collection_check_boxes` - [@ug0](https://github.com/ug0).
+* [#449](https://github.com/bootstrap-ruby/bootstrap_form/pull/449): Bootstrap 4 no longer mixes in `.row` in `.form-group`. `bootstrap_form` adds `.row` to `div.form-group` when layout is horizontal.
 
 ### New features
 
@@ -28,6 +72,11 @@ In addition to these necessary markup changes, the bootstrap_form API itself has
 * Allow HTML in help translations by using the `_html` suffix on the key - [@unikitty37](https://github.com/unikitty37)
 * [#408](https://github.com/bootstrap-ruby/bootstrap_form/pull/408): Add option[:id] on static control #245 - [@duleorlovic](https://github.com/duleorlovic).
 * [#455](https://github.com/bootstrap-ruby/bootstrap_form/pull/455): Support for i18n `:html` subkeys in help text - [@jsaraiva](https://github.com/jsaraiva).
+* Adds support for `label_as_placeholder` option, which will set the label text as an input fields placeholder (and hiding the label for sr_only).
+* [#449](https://github.com/bootstrap-ruby/bootstrap_form/pull/449): Passing `.form-row` overrides default `.form-group.row` in horizontal layouts.
+* Added an option to the `submit` (and `primary`, by transitivity) form tag helper, `render_as_button`, which when truthy makes the submit button render as a button instead of an input. This allows you to easily provide further styling to your form submission buttons, without requiring you to reinvent the wheel and use the `button` helper (and having to manually insert the typical Bootstrap classes). - [@jsaraiva](https://github.com/jsaraiva).
+* Add `:error_message` option to `check_box` and `radio_button`, so they can output validation error messages if needed. [@lcreid](https://github.com/lcreid).
+* [#487](https://github.com/bootstrap-ruby/bootstrap_form/pull/487): Add add_control_col_class option on form_group. - [@ThomasSevestre](https://github.com/ThomasSevestre).
 * Your contribution here!
 
 ### Bugfixes
@@ -35,7 +84,6 @@ In addition to these necessary markup changes, the bootstrap_form API itself has
 * [#357](https://github.com/bootstrap-ruby/bootstrap_form/pull/357) if provided,
   use html option `id` to specify `for` attribute on label
   [@duleorlovic](https://github.com/duleorlovic)
-* Your contribution here!
 
 
 ## [2.7.0][] (2017-04-21)
@@ -197,7 +245,9 @@ Features:
   - Added support for bootstrap_form_tag (@baldwindavid)
 
 
-[Pending Release]: https://github.com/bootstrap-ruby/bootstrap_form/compare/v2.7.0...HEAD
+[Pending Release]: https://github.com/bootstrap-ruby/bootstrap_form/compare/v4.0.0...HEAD
+[4.0.0]: https://github.com/bootstrap-ruby/bootstrap_form/compare/v4.0.0.alpha1...v4.0.0
+[4.0.0.alpha1]: https://github.com/bootstrap-ruby/bootstrap_form/compare/v2.7.0...v4.0.0.alpha1
 [2.7.0]: https://github.com/bootstrap-ruby/bootstrap_form/compare/v2.6.0...v2.7.0
 [2.6.0]: https://github.com/bootstrap-ruby/bootstrap_form/compare/v2.5.3...v2.6.0
 [2.5.3]: https://github.com/bootstrap-ruby/bootstrap_form/compare/v2.5.2...v2.5.3

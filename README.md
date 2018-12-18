@@ -21,9 +21,7 @@ Bootstrap v4-style forms into your Rails application.
 Add it to your Gemfile:
 
 ```ruby
-gem "bootstrap_form",
-    git: "https://github.com/bootstrap-ruby/bootstrap_form.git",
-    branch: "master"
+gem "bootstrap_form", ">= 4.0.0"
 ```
 
 Then:
@@ -164,6 +162,8 @@ This gem wraps the following Rails form helpers:
 * time_zone_select
 * url_field
 * week_field
+* submit
+* button
 
 These helpers accept the same options as the standard Rails form helpers, with
 a few extra options:
@@ -189,6 +189,12 @@ To add custom classes to the field's label:
 <%= f.text_field :email, label_class: "custom-class" %>
 ```
 
+Or you can add the label as input placeholder instead (this automatically hides the label):
+
+```erb
+<%= f.text_field :email, label_as_placeholder: true %>
+```
+
 #### Required Fields
 
 A label that is associated with a required field is automatically annotated with
@@ -207,10 +213,11 @@ validator with the associated model attribute. Presently this is one of:
 ActiveRecord::Validations::PresenceValidator or
 ActiveModel::Validations::PresenceValidator.
 
-In cases where this behavior is undesirable, use the `skip_required` option:
+In cases where this behavior is undesirable, use the `required` option to force the class to be present or absent:
 
 ```erb
-<%= f.password_field :password, label: "New Password", skip_required: true %>
+<%= f.password_field :login, label: "New Username", required: true %>
+<%= f.password_field :password, label: "New Password", required: false %>
 ```
 
 ### Input Elements / Controls
@@ -342,9 +349,15 @@ To display checkboxes and radios inline, pass the `inline: true` option:
 <% end %>
 ```
 
+Check boxes and radio buttons are wrapped in a `div.form-check`. You can add classes to this `div` with the `:wrapper_class` option:
+
+```erb
+<%= f.radio_button :skill_level, 0, label: "Novice", inline: true, wrapper_class: "w-auto" %>
+```
+
 #### Collections
 
-`bootstrap_form` also provides helpers that automatically creates the
+`bootstrap_form` also provides helpers that automatically create the
 `form_group` and the `radio_button`s or `check_box`es for you:
 
 ```erb
@@ -395,7 +408,7 @@ this defining these selects as `inline-block` and a width of `auto`.
 
 ### Submit Buttons
 
-The `btn btn-secondary` css classes are automatically added to your submit
+The `btn btn-secondary` CSS classes are automatically added to your submit
 buttons.
 
 ```erb
@@ -414,6 +427,49 @@ You can specify your own classes like this:
 ```erb
 <%= f.submit "Log In", class: "btn btn-success" %>
 ```
+
+If the `primary` helper receives a `render_as_button: true` option or a block,
+it will be rendered as an HTML button, instead of an input tag. This allows you
+to specify HTML content and styling for your buttons (such as adding
+illustrative icons to them). For example, the following statements
+
+```erb
+<%= f.primary "Save changes <span class='fa fa-save'></span>".html_safe, render_as_button: true %>
+
+<%= f.primary do
+      concat 'Save changes '
+      concat content_tag(:span, nil, class: 'fa fa-save')
+    end %>
+```
+
+are equivalent, and each of them both be rendered as
+
+```html
+<button name="button" type="submit" class="btn btn-primary">Save changes <span class="fa fa-save"></span></button>
+```
+
+If you wish to add additional CSS classes to your button, while keeping the
+default ones, you can use the `extra_class` option. This is particularly useful
+for adding extra details to buttons (without forcing you to repeat the
+Bootstrap classes), or for element targeting via CSS classes.
+Be aware, however, that using the `class` option will discard any extra classes
+you add. As an example, the following button declarations
+
+```erb
+<%= f.primary "My Nice Button", extra_class: 'my-button' %>
+
+<%= f.primary "My Button", class: 'my-button' %>
+```
+
+will be rendered as
+
+```html
+<input type="submit" value="My Nice Button" class="btn btn-primary my-button" />
+
+<input type="submit" value="My Button" class="my-button" />
+```
+
+(some unimportant HTML attributes have been removed for simplicity)
 
 ### Accessing Rails Form Helpers
 
@@ -478,6 +534,18 @@ The `label_col` and `control_col` css classes can also be changed per control:
 <%= bootstrap_form_for(@user, layout: :horizontal) do |f| %>
   <%= f.email_field :email %>
   <%= f.text_field :age, control_col: "col-sm-3" %>
+  <%= f.form_group do %>
+    <%= f.submit %>
+  <% end %>
+<% end %>
+```
+
+Control col wrapper class can be modified with `add_control_col_class`. This option will preserve column definition:
+
+```erb
+<%= bootstrap_form_for(@user, layout: :horizontal) do |f| %>
+  <%= f.email_field :email %>
+  <%= f.text_field :age, add_control_col_class: "additional-control-col-class" %>
   <%= f.form_group do %>
     <%= f.submit %>
   <% end %>
@@ -630,6 +698,21 @@ Which outputs:
 
 bootstrap_form follows standard rails conventions so it's i18n-ready. See more
 here: http://guides.rubyonrails.org/i18n.html#translations-for-active-record-models
+
+## Other Tips and Edge Cases
+By their very nature, forms are extremely diverse. It would be extremely difficult to provide a gem that could handle every need. Here are some tips for handling edge cases.
+
+### Empty But Visible Labels
+Some third party plug-ins require an empty but visible label on an input control. The `hide_label` option generates a label that won't appear on the screen, but it's considered invisible and therefore doesn't work with such a plug-in. An empty label (e.g. `""`) causes the underlying Rails helper to generate a label based on the field's attribute's name.
+
+The solution is to use a zero-width character for the label, or some other "empty" HTML. For example:
+```
+label: "&#8203;".html_safe
+```
+or
+```
+label: "<span></span>".html_safe
+```
 
 ## Code Triage page
 

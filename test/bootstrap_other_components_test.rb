@@ -20,7 +20,7 @@ class BootstrapOtherComponentsTest < ActionView::TestCase
   end
 
   test "static control can have custom_id" do
-    output = @horizontal_builder.static_control :email, id: 'custom_id'
+    output = @horizontal_builder.static_control :email, id: "custom_id"
 
     expected = <<-HTML.strip_heredoc
       <div class="form-group row">
@@ -55,6 +55,20 @@ class BootstrapOtherComponentsTest < ActionView::TestCase
         <label class="col-form-label col-sm-2" for="user_">Custom Label</label>
         <div class="col-sm-10">
           <input class="form-control-plaintext" id="user_" name="user[]" readonly="readonly" type="text" value="Custom Control"/>
+        </div>
+      </div>
+    HTML
+    assert_equivalent_xml expected, output
+  end
+
+  test "static control support a nil value" do
+    output = @horizontal_builder.static_control label: "Custom Label", value: nil
+
+    expected = <<-HTML.strip_heredoc
+      <div class="form-group row">
+        <label class="col-form-label col-sm-2" for="user_">Custom Label</label>
+        <div class="col-sm-10">
+          <input class="form-control-plaintext" id="user_" name="user[]" readonly="readonly" type="text"/>
         </div>
       </div>
     HTML
@@ -117,28 +131,65 @@ class BootstrapOtherComponentsTest < ActionView::TestCase
     assert_equivalent_xml expected, output
   end
 
+  test "regular button uses proper css classes" do
+    expected = %q(<button class="btn btn-secondary" name="button" type="submit"><span>I'm HTML!</span> in a button!</button>)
+    assert_equivalent_xml expected,
+                          @builder.button("<span>I'm HTML!</span> in a button!".html_safe)
+  end
+
+  test "regular button can have extra css classes" do
+    expected = %q(<button class="btn btn-secondary test-button" name="button" type="submit"><span>I'm HTML!</span> in a button!</button>)
+    assert_equivalent_xml expected,
+                          @builder.button("<span>I'm HTML!</span> in a button!".html_safe, extra_class: "test-button")
+  end
+
   test "submit button defaults to rails action name" do
-    expected = %{<input class="btn btn-secondary" name="commit" type="submit" value="Create User" />}
+    expected = '<input class="btn btn-secondary" name="commit" type="submit" value="Create User" />'
     assert_equivalent_xml expected, @builder.submit
   end
 
   test "submit button uses default button classes" do
-    expected = %{<input class="btn btn-secondary" name="commit" type="submit" value="Submit Form" />}
+    expected = '<input class="btn btn-secondary" name="commit" type="submit" value="Submit Form" />'
     assert_equivalent_xml expected, @builder.submit("Submit Form")
   end
 
+  test "submit button can have extra css classes" do
+    expected = '<input class="btn btn-secondary test-button" name="commit" type="submit" value="Submit Form" />'
+    assert_equivalent_xml expected, @builder.submit("Submit Form", extra_class: "test-button")
+  end
+
   test "override submit button classes" do
-    expected = %{<input class="btn btn-primary" name="commit" type="submit" value="Submit Form" />}
+    expected = '<input class="btn btn-primary" name="commit" type="submit" value="Submit Form" />'
     assert_equivalent_xml expected, @builder.submit("Submit Form", class: "btn btn-primary")
   end
 
   test "primary button uses proper css classes" do
-    expected = %{<input class="btn btn-primary" name="commit" type="submit" value="Submit Form" />}
+    expected = '<input class="btn btn-primary" name="commit" type="submit" value="Submit Form" />'
     assert_equivalent_xml expected, @builder.primary("Submit Form")
   end
 
+  test "primary button can have extra css classes" do
+    expected = '<input class="btn btn-primary test-button" name="commit" type="submit" value="Submit Form" />'
+    assert_equivalent_xml expected, @builder.primary("Submit Form", extra_class: "test-button")
+  end
+
+  test "primary button can render as HTML button" do
+    expected = %q(<button class="btn btn-primary" name="button" type="submit"><span>I'm HTML!</span> Submit Form</button>)
+    assert_equivalent_xml expected,
+                          @builder.primary("<span>I'm HTML!</span> Submit Form".html_safe,
+                                           render_as_button: true)
+  end
+
+  test "primary button with content block renders as HTML button" do
+    output = @builder.primary do
+      "<span>I'm HTML!</span> Submit Form".html_safe
+    end
+    expected = %q(<button class="btn btn-primary" name="button" type="submit"><span>I'm HTML!</span> Submit Form</button>)
+    assert_equivalent_xml expected, output
+  end
+
   test "override primary button classes" do
-    expected = %{<input class="btn btn-primary disabled" name="commit" type="submit" value="Submit Form" />}
+    expected = '<input class="btn btn-primary disabled" name="commit" type="submit" value="Submit Form" />'
     assert_equivalent_xml expected, @builder.primary("Submit Form", class: "btn btn-primary disabled")
   end
 end

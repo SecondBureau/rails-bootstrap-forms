@@ -4,10 +4,11 @@ gemspec path: "../../"
 
 gem "rails", "~> 5.1.0"
 
-group :test do
-  # TODO: remove once Rails 5.1.5 is released
-  gem "minitest", "~> 5.10.3"
+group :development do
+  gem "rubocop", require: false
+end
 
+group :test do
   gem "diffy"
   gem "equivalent-xml"
   gem "mocha"

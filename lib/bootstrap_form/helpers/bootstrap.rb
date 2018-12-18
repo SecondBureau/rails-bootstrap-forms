@@ -1,18 +1,29 @@
 module BootstrapForm
   module Helpers
     module Bootstrap
-      def submit(name = nil, options = {})
-        options.reverse_merge! class: 'btn btn-secondary'
-        super(name, options)
+      def button(value=nil, options={}, &block)
+        setup_css_class "btn btn-secondary", options
+        super
       end
 
-      def primary(name = nil, options = {})
-        options.reverse_merge! class: 'btn btn-primary'
-        submit(name, options)
+      def submit(name=nil, options={})
+        setup_css_class "btn btn-secondary", options
+        super
       end
 
-      def alert_message(title, options = {})
-        css = options[:class] || 'alert alert-danger'
+      def primary(name=nil, options={}, &block)
+        setup_css_class "btn btn-primary", options
+
+        if options[:render_as_button] || block_given?
+          options.except! :render_as_button
+          button(name, options, &block)
+        else
+          submit(name, options)
+        end
+      end
+
+      def alert_message(title, options={})
+        css = options[:class] || "alert alert-danger"
 
         if object.respond_to?(:errors) && object.errors.full_messages.any?
           content_tag :div, class: css do
@@ -23,14 +34,16 @@ module BootstrapForm
       end
 
       def error_summary
-        content_tag :ul, class: 'rails-bootstrap-forms-error-summary' do
-          object.errors.full_messages.each do |error|
-            concat content_tag(:li, error)
+        if object.errors.any?
+          content_tag :ul, class: "rails-bootstrap-forms-error-summary" do
+            object.errors.full_messages.each do |error|
+              concat content_tag(:li, error)
+            end
           end
         end
       end
 
-      def errors_on(name, options = {})
+      def errors_on(name, options={})
         if has_error?(name)
           hide_attribute_name = options[:hide_attribute_name] || false
 
@@ -48,12 +61,12 @@ module BootstrapForm
         options = args.extract_options!
         name = args.first
 
-        static_options = options.merge({
+        static_options = options.merge(
           readonly: true,
           control_class: [options[:control_class], static_class].compact.join(" ")
-        })
+        )
 
-        static_options[:value] = object.send(name) if static_options[:value].nil?
+        static_options[:value] = object.send(name) unless static_options.key?(:value)
 
         text_field_with_bootstrap(name, static_options)
       end
@@ -67,32 +80,41 @@ module BootstrapForm
 
       def prepend_and_append_input(name, options, &block)
         options = options.extract!(:prepend, :append, :input_group_class)
-        input_group_class = ["input-group", options[:input_group_class]].compact.join(' ')
+        input_group_class = ["input-group", options[:input_group_class]].compact.join(" ")
 
         input = capture(&block) || "".html_safe
 
-        input = content_tag(:div, input_group_content(options[:prepend]), class: 'input-group-prepend') + input if options[:prepend]
-        input << content_tag(:div, input_group_content(options[:append]), class: 'input-group-append') if options[:append]
+        input = content_tag(:div, input_group_content(options[:prepend]), class: "input-group-prepend") + input if options[:prepend]
+        input << content_tag(:div, input_group_content(options[:append]), class: "input-group-append") if options[:append]
         input << generate_error(name)
         input = content_tag(:div, input, class: input_group_class) unless options.empty?
         input
       end
 
-      # Some helpers don't currently accept prepend and append. However, it's not
-      # clear if that's corrent. In the meantime, strip to options before calling
-      # methods that don't accept prepend and append.
-      def prevent_prepend_and_append!(options)
-        options.delete(:append)
-        options.delete(:prepend)
+      def input_with_error(name, &block)
+        input = capture(&block)
+        input << generate_error(name)
       end
 
       def input_group_content(content)
-        return content if content.match(/btn/)
-        content_tag(:span, content, class: 'input-group-text')
+        return content if content =~ /btn/
+
+        content_tag(:span, content, class: "input-group-text")
       end
 
       def static_class
         "form-control-plaintext"
+      end
+
+      private
+
+      def setup_css_class(the_class, options={})
+        unless options.key? :class
+          if (extra_class = options.delete(:extra_class))
+            the_class = "#{the_class} #{extra_class}"
+          end
+          options[:class] = the_class
+        end
       end
     end
   end

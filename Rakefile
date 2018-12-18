@@ -1,5 +1,6 @@
 begin
   require 'bundler/setup'
+  require 'rubocop/rake_task'
 rescue LoadError
   puts 'You must `gem install bundler` and `bundle install` to run rake tasks'
 end
@@ -24,4 +25,15 @@ Rake::TestTask.new(:test) do |t|
   t.verbose = false
 end
 
-task default: :test
+# This automatically updates GitHub Releases whenever we `rake release` the gem
+task "release:rubygem_push" do
+  require "chandler/tasks"
+  Rake.application.invoke_task("chandler:push")
+end
+
+desc 'Run RuboCop checks -- see .rubocop_todo.yml for outstanding offenses'
+RuboCop::RakeTask.new(:rubocop) do |task|
+  task.options = %w[--config .rubocop_todo.yml]
+end
+
+task default: %i[test rubocop]
