@@ -22,7 +22,6 @@ Gem::Specification.new do |s|
   s.bindir        = "exe"
   s.require_paths = ["lib"]
 
-  s.required_ruby_version = ">= 2.2.2"
+  s.required_ruby_version = ">= 2.3"
 
-  s.add_dependency "rails", ">= 4.0"
 end

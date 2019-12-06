@@ -1,7 +1,7 @@
 require_relative "./test_helper"
 
 class BootstrapFormGroupTest < ActionView::TestCase
-  include BootstrapForm::Helper
+  include BootstrapForm::ActionViewExtensions::FormHelper
 
   setup :setup_test_fixture
 
@@ -81,7 +81,9 @@ class BootstrapFormGroupTest < ActionView::TestCase
         <input class="form-control" id="user_email" name="user[email]" type="text" value="steve@example.com" />
       </div>
     HTML
-    assert_equivalent_xml expected, @builder.text_field(:email, skip_required: true)
+    assert_output(nil, "`:skip_required` is deprecated, use `:required: false` instead\n") do
+      assert_equivalent_xml expected, @builder.text_field(:email, skip_required: true)
+    end
   end
 
   test "preventing a label from having the required class" do
@@ -98,7 +100,7 @@ class BootstrapFormGroupTest < ActionView::TestCase
     expected = <<-HTML.strip_heredoc
       <div class="form-group">
         <label class="required" for="user_comments">Comments</label>
-        <input class="form-control" id="user_comments" name="user[comments]" type="text" value="my comment" />
+        <input class="form-control" id="user_comments" name="user[comments]" type="text" value="my comment" required="required" />
       </div>
     HTML
     assert_equivalent_xml expected, @builder.text_field(:comments, required: true)
@@ -183,7 +185,7 @@ class BootstrapFormGroupTest < ActionView::TestCase
 
     expected = <<-HTML.strip_heredoc
       <form accept-charset="UTF-8" action="/users" class="new_user" id="new_user" method="post" role="form">
-        <input name="utf8" type="hidden" value="&#x2713;"/>
+        #{'<input name="utf8" type="hidden" value="&#x2713;"/>' unless ::Rails::VERSION::STRING >= '6'}
         <div class="form-group">
           <label class="required" for="user_email">Email</label>
           <div class="input-group">
@@ -429,7 +431,7 @@ class BootstrapFormGroupTest < ActionView::TestCase
 
     expected = <<-HTML.strip_heredoc
       <form accept-charset="UTF-8" action="/users" class="new_user" id="new_user" method="post" role="form">
-        <input name="utf8" type="hidden" value="&#x2713;"/>
+        #{'<input name="utf8" type="hidden" value="&#x2713;"/>' unless ::Rails::VERSION::STRING >= '6'}
         <div class="form-group">
           <div class="form-check">
             <input class="form-check-input is-invalid" id="user_misc_primary_school" name="user[misc]" type="radio" value="primary school"/>
@@ -488,7 +490,7 @@ class BootstrapFormGroupTest < ActionView::TestCase
 
     expected = <<-HTML.strip_heredoc
       <form accept-charset="UTF-8" action="/users" class="new_user" id="new_user" method="post" role="form">
-        <input name="utf8" type="hidden" value="&#x2713;" />
+        #{'<input name="utf8" type="hidden" value="&#x2713;"/>' unless ::Rails::VERSION::STRING >= '6'}
         <div class="form-group none-margin">
           <label class="required" for="user_email">Email</label>
           <input class="form-control is-invalid" id="user_email" name="user[email]" type="text" />
@@ -561,6 +563,11 @@ class BootstrapFormGroupTest < ActionView::TestCase
     assert_equivalent_xml expected, @builder.search_field(:misc, wrapper: { data: { foo: "bar" } })
   end
 
+  test "rendering without wrapper" do
+    expected = '<input class="form-control" id="user_email" name="user[email]" type="text" value="steve@example.com" />'
+    assert_equivalent_xml expected, @builder.text_field(:email, wrapper: false)
+  end
+
   test "passing options to a form control get passed through" do
     expected = <<-HTML.strip_heredoc
       <div class="form-group">
@@ -587,7 +594,7 @@ class BootstrapFormGroupTest < ActionView::TestCase
   test "custom form group layout option" do
     expected = <<-HTML.strip_heredoc
       <form accept-charset="UTF-8" action="/users" class="new_user" id="new_user" method="post" role="form">
-        <input name="utf8" type="hidden" value="&#x2713;" />
+        #{'<input name="utf8" type="hidden" value="&#x2713;"/>' unless ::Rails::VERSION::STRING >= '6'}
         <div class="form-group form-inline">
           <label class="mr-sm-2 required" for="user_email">Email</label>
           <input class="form-control" id="user_email" name="user[email]" type="email" value="steve@example.com" />

@@ -30,11 +30,11 @@ end
 # ------------------------------------------------------------------------------
 if !has_changelog_changes && has_lib_changes
   markdown <<-MARKDOWN
-Here's an example of a CHANGELOG.md entry (place it immediately under the `* Your contribution here!` line):
+  Here's an example of a CHANGELOG.md entry (place it immediately under the `* Your contribution here!` line):
 
-```markdown
-* [##{pr_number}](#{pr_url}): #{github.pr_title} - [@#{github.pr_author}](https://github.com/#{github.pr_author}).
-```
+  ```markdown
+  * [##{pr_number}](#{pr_url}): #{github.pr_title} - [@#{github.pr_author}](https://github.com/#{github.pr_author}).
+  ```
   MARKDOWN
   warn("Please update CHANGELOG.md with a description of your changes. "\
        "If this PR is not a user-facing change (e.g. just refactoring), "\

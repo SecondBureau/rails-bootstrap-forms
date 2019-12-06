@@ -1,7 +1,7 @@
 require_relative "./test_helper"
 
 class BootstrapRadioButtonTest < ActionView::TestCase
-  include BootstrapForm::Helper
+  include BootstrapForm::ActionViewExtensions::FormHelper
 
   setup :setup_test_fixture
 
@@ -32,7 +32,7 @@ class BootstrapRadioButtonTest < ActionView::TestCase
     @user.errors.add(:misc, "error for test")
     expected = <<-HTML.strip_heredoc
     <form accept-charset="UTF-8" action="/users" class="new_user" id="new_user" method="post" role="form">
-      <input name="utf8" type="hidden" value="&#x2713;"/>
+      #{'<input name="utf8" type="hidden" value="&#x2713;"/>' unless ::Rails::VERSION::STRING >= '6'}
       <div class="form-check">
         <input class="form-check-input is-invalid" id="user_misc_1" name="user[misc]" type="radio" value="1" />
         <label class="form-check-label" for="user_misc_1">
@@ -98,8 +98,8 @@ class BootstrapRadioButtonTest < ActionView::TestCase
 
   test "radio_button inline label is set correctly from form level" do
     expected = <<-HTML.strip_heredoc
-      <form accept-charset="UTF-8" action="/users" class="form-inline" id="new_user" method="post" role="form">
-        <input name="utf8" type="hidden" value="&#x2713;"/>
+      <form accept-charset="UTF-8" action="/users" class="new_user form-inline" id="new_user" method="post" role="form">
+        #{'<input name="utf8" type="hidden" value="&#x2713;"/>' unless ::Rails::VERSION::STRING >= '6'}
         <div class="form-check form-check-inline">
           <input class="form-check-input" id="user_misc_1" name="user[misc]" type="radio" value="1" />
           <label class="form-check-label" for="user_misc_1">
@@ -183,7 +183,7 @@ class BootstrapRadioButtonTest < ActionView::TestCase
     collection = [Address.new(id: 1, street: "Foo"), Address.new(id: 2, street: "Bar")]
     expected = <<-HTML.strip_heredoc
       <form accept-charset="UTF-8" action="/users" class="new_user" id="new_user" method="post" role="form">
-        <input name="utf8" type="hidden" value="&#x2713;"/>
+        #{'<input name="utf8" type="hidden" value="&#x2713;"/>' unless ::Rails::VERSION::STRING >= '6'}
         <div class="form-group">
           <label for="user_misc">Misc</label>
           <div class="form-check">
@@ -418,7 +418,7 @@ class BootstrapRadioButtonTest < ActionView::TestCase
     @user.errors.add(:misc, "error for test")
     expected = <<-HTML.strip_heredoc
     <form accept-charset="UTF-8" action="/users" class="new_user" id="new_user" method="post" role="form">
-      <input name="utf8" type="hidden" value="&#x2713;"/>
+      #{'<input name="utf8" type="hidden" value="&#x2713;"/>' unless ::Rails::VERSION::STRING >= '6'}
       <div class="custom-control custom-radio">
         <input class="custom-control-input is-invalid" id="user_misc_1" name="user[misc]" type="radio" value="1" />
         <label class="custom-control-label" for="user_misc_1">This is a radio button</label>

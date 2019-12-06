@@ -12,6 +12,36 @@
 
 * Your contribution here!
 
+## [4.3.0][] (2019-03-08)
+
+### New features
+
+* [#503] Support Rails 6.0.0.
+* Small documentation changes.
+
+## [4.2.0][] (2019-03-08)
+
+### New features
+
+* [#508] Support `rich_text_area` AKA the Trix editor on Rails 6+.
+* [#518] Move all inputs to separate, more maintainable files.
+* [#514](https://github.com/bootstrap-ruby/bootstrap_form/pull/514): Add support for BS 4.2 switches - [@simmerz](https://github.com/simmerz)
+
+### Bugfixes
+
+* [#522](https://github.com/bootstrap-ruby/bootstrap_form/pull/522): Clean up rubocop offences - [@simmerz](https://github.com/simmerz)
+* [#524](https://github.com/bootstrap-ruby/bootstrap_form/pull/524): Fix non-inline layout rendering without help text - [@simmerz](https://github.com/simmerz)
+
+## [4.1.0][] (2019-01-19)
+
+### New features
+
+- [#259] Allow to render input without wrapper [@yevhene].
+
+### Bugfixes
+
+* [#496] Ensure required attribute is passed through to input tag.
+
 ## [4.0.0][] (2018-10-27)
 
 🚨 **This release adds support for Bootstrap v4 and drops support for Bootstrap v3.** 🚨
@@ -245,7 +275,9 @@ Features:
   - Added support for bootstrap_form_tag (@baldwindavid)
 
 
-[Pending Release]: https://github.com/bootstrap-ruby/bootstrap_form/compare/v4.0.0...HEAD
+[Pending Release]: https://github.com/bootstrap-ruby/bootstrap_form/compare/v4.2.0...HEAD
+[4.2.0]: https://github.com/bootstrap-ruby/bootstrap_form/compare/v4.1.0...v4.2.0
+[4.1.0]: https://github.com/bootstrap-ruby/bootstrap_form/compare/v4.0.0...v4.1.0
 [4.0.0]: https://github.com/bootstrap-ruby/bootstrap_form/compare/v4.0.0.alpha1...v4.0.0
 [4.0.0.alpha1]: https://github.com/bootstrap-ruby/bootstrap_form/compare/v2.7.0...v4.0.0.alpha1
 [2.7.0]: https://github.com/bootstrap-ruby/bootstrap_form/compare/v2.6.0...v2.7.0
